@@ -1,1 +1,2 @@
-# pokemon-go.github.io
+# Pokemon-Go-Map
+Map of Pokemon's Locations in Pokemon Go
