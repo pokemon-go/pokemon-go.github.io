@@ -427,8 +427,14 @@
                 icon: image
             });
             markerCluster.addMarker(marker);
-
+            firebase.database().ref('pokemon').child(pokemon.name).child(pokemon.key).child('score').on('value', function(snapshot) {
+                if(snapshot.val() <= -5) {
+                    firebase.database().ref('pokemon').child(pokemon.name).child(pokemon.key).remove();
+                    firebase.database().ref('posts').child(pokemon.key).remove();
+                }
+            })
             marker.addListener('click', function() {
+
                 infowindow.open(map, marker);
                 $('button.upvote-' + (pokemon.key)).click(function() {
                     firebase.database().ref('pokemon').child(pokemon.name).child(pokemon.key).transaction(function(post) {
@@ -441,10 +447,6 @@
                 $('button.downvote-' + (pokemon.key)).click(function() {
                     firebase.database().ref('pokemon').child(pokemon.name).child(pokemon.key).transaction(function(post) {
                         post.score--;
-                        if (post.score < -5) {
-                            firebase.database().ref('pokemon').child(pokemon.name).child(pokemon.key).remove();
-                            firebase.database().ref('posts').child(pokemon.key).remove();
-                        }
                         return post;
                     })
                 })
