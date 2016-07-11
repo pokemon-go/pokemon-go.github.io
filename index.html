@@ -64,7 +64,7 @@
         }
 
         #choiceDiv {
-            margin-top:10px;
+            margin-top: 10px;
         }
 
         select {
@@ -80,16 +80,15 @@
             background-position: center right;
             background-repeat: no-repeat;
             border-radius: 0px;
-            border:none;
+            border: none;
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
             color: #555;
             font-size: inherit;
-            height:28px;
-            padding:5px;
+            height: 28px;
+            padding: 5px;
             margin: 0;
             overflow: hidden;
             margin-left: 15px;
-
             text-overflow: ellipsis;
             white-space: nowrap;
         }
@@ -354,8 +353,6 @@
                     name: $('select').val(),
 
                 }
-                console.log($('select').val())
-
                 var newPostKey = firebase.database().ref('pokemon').child(pokemon.name).push({
                     location: {
                         lat: event.latLng.lat(),
@@ -379,16 +376,14 @@
         }
         */
         function addMarker(pokemon, location, map) {
-            console.log(pokemon.score)
             var contentString =
                 "<div id=" + pokemon.key + ">" +
-                '<button class="'+ 'upvote-'+pokemon.key + '"> Upvote </button>' +
-                '<button class="'+ 'downvote-'+pokemon.key + '"> Downvote </button>' +
-                '<div id="'+ 'score-'+pokemon.key + '">Score: '+pokemon.score+' </div>'
-                "</div>";
+                '<button class="' + 'upvote-' + pokemon.key + '"> Upvote </button>' +
+                '<button class="' + 'downvote-' + pokemon.key + '"> Downvote </button>' +
+                '<div id="' + 'score-' + pokemon.key + '">Score: ' + pokemon.score + ' </div>'
+            "</div>";
 
 
-            console.log(pokemon.name);
             var image = 'icons/' + getDexNum(pokemon.name) + '.png';
             console.log(image);
             var infowindow = new google.maps.InfoWindow({
@@ -403,23 +398,27 @@
             });
             marker.addListener('click', function() {
                 infowindow.open(map, marker);
-                $('button.upvote-'+(pokemon.key)).click(function(){
+                $('button.upvote-' + (pokemon.key)).click(function() {
                     console.log(pokemon.key);
-                    firebase.database().ref('pokemon').child(pokemon.name).child(pokemon.key).transaction(function(post){
+                    firebase.database().ref('pokemon').child(pokemon.name).child(pokemon.key).transaction(function(post) {
                         post.score++;
                         return post;
                     })
 
                 })
 
-                $('button.downvote-'+(pokemon.key)).click(function(){
+                $('button.downvote-' + (pokemon.key)).click(function() {
                     console.log(pokemon.key);
-                    firebase.database().ref('pokemon').child(pokemon.name).child(pokemon.key).transaction(function(post){
+                    firebase.database().ref('pokemon').child(pokemon.name).child(pokemon.key).transaction(function(post) {
                         post.score--;
+                        if (post.score < -5) {
+                            firebase.database().ref('pokemon').child(pokemon.name).child(pokemon.key).remove();
+                            firebase.database().ref('posts').child(pokemon.key).remove();
+                        }
                         return post;
                     })
                 })
-                $('.score-'+(pokemon.key)).textContent = pokemon.score;
+                $('.score-' + (pokemon.key)).textContent = pokemon.score;
             });
 
         }
