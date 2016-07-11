@@ -354,7 +354,8 @@
                 firebase.database().ref('pokemon').child(data.val()).child(data.key).on('value', function(snapshot) {
                     addMarker({
                         name: data.val(),
-                        key: data.key
+                        key: data.key,
+                        score: snapshot.val().score
                     }, new google.maps.LatLng(snapshot.val().location), map);
                 })
             })
@@ -388,12 +389,15 @@
         }
         */
         function addMarker(pokemon, location, map) {
-
+            console.log(pokemon.score)
             var contentString =
                 "<div id=" + pokemon.key + ">" +
-                '<button class="upvote"> Upvote </button>' +
-                '<button class="downvote"> Downvote </button>' +
+                '<button class="'+ 'upvote-'+pokemon.key + '"> Upvote </button>' +
+                '<button class="'+ 'downvote-'+pokemon.key + '"> Downvote </button>' +
+                '<div id="'+ 'score-'+pokemon.key + '">Score: '+pokemon.score+' </div>'
                 "</div>";
+
+
             console.log(pokemon.name);
             var image = 'icons/' + getDexNum(pokemon.name) + '.png';
             console.log(image);
@@ -409,7 +413,25 @@
             });
             marker.addListener('click', function() {
                 infowindow.open(map, marker);
+                $('button.upvote-'+(pokemon.key)).click(function(){
+                    console.log(pokemon.key);
+                    firebase.database().ref('pokemon').child(pokemon.name).child(pokemon.key).transaction(function(post){
+                        post.score++;
+                        return post;
+                    })
+
+                })
+
+                $('button.downvote-'+(pokemon.key)).click(function(){
+                    console.log(pokemon.key);
+                    firebase.database().ref('pokemon').child(pokemon.name).child(pokemon.key).transaction(function(post){
+                        post.score--;
+                        return post;
+                    })
+                })
+                $('.score-'+(pokemon.key)).textContent = pokemon.score;
             });
+
         }
 
         function getDexNum(name) {
