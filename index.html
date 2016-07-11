@@ -258,6 +258,7 @@
     <script src="https://www.gstatic.com/firebasejs/3.1.0/firebase.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.0.0/jquery.min.js"></script>
     <script>
+        var markerCluster;
         var config = {
             apiKey: "AIzaSyCFNsUJpn18dhvIbHo6r1Icy-TIDFOtfys",
             authDomain: "pokemon-go-1367.firebaseapp.com",
@@ -278,6 +279,8 @@
                 zoom: 13,
                 mapTypeId: google.maps.MapTypeId.ROADMAP
             });
+            markerCluster = new MarkerClusterer(map);
+            markerCluster.setImagePath('/images/m')
 
             // Try HTML5 geolocation.
             if (navigator.geolocation) {
@@ -346,6 +349,7 @@
                         key: data.key,
                         score: snapshot.val().score
                     }, new google.maps.LatLng(snapshot.val().location), map);
+
                 })
             })
             google.maps.event.addListener(map, 'click', function(event) {
@@ -396,6 +400,9 @@
                 title: pokemon.name,
                 icon: image
             });
+            markerCluster.addMarker(marker);
+            console.log(markerCluster.getImagePath())
+
             marker.addListener('click', function() {
                 infowindow.open(map, marker);
                 $('button.upvote-' + (pokemon.key)).click(function() {
@@ -442,9 +449,10 @@
                 'Error: The Geolocation service failed.' :
                 'Error: Your browser doesn\'t support geolocation.');
         }
-        
+
     </script>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAvOUYLUnFFYD_Nukivj26TVTaSASgv0jc&signed_in=true&libraries=places&callback=initAutocomplete" async defer></script>
+    <script src="data/markerclusterer.js"></script>
 </body>
 
 </html>
